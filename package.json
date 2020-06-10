@@ -45,7 +45,9 @@
     "grunt-babel": "^8.0.0",
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-concat": "^1.0.1",
-    "grunt-contrib-imagemin": "^4.0.0",
+    "grunt-contrib-connect": "^2.1.0",
+    "grunt-contrib-cssmin": "^3.0.0",
+    "grunt-contrib-uglify": "^4.0.1",
     "grunt-contrib-watch": "^1.1.0",
     "grunt-pipe": "^1.0.0",
     "grunt-sass": "^3.1.0",
@@ -56,7 +58,9 @@
     "swig": "^1.4.2",
     "useref": "^1.4.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "grunt-contrib-imagemin": "^4.0.0"
+  },
   "engines": {
     "node": ">=6"
   }

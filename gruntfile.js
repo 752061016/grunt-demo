@@ -1,7 +1,8 @@
 const sass = require('sass')
 const loadGruntTasks = require('load-grunt-tasks')
 const swig = require('swig')
-var useref = require('useref');
+const useref = require('useref')
+
 
 // 默认文件路径配置
 let config = {
@@ -86,8 +87,8 @@ module.exports = grunt => {
                 files: [{
                     expand: true,
                     cwd: 'src/',
-                    src: ['**/*.{png,jpg,jpeg}'],
-                    dest: 'temp/'
+                    src: ['**/*.{png,jpg,jpeg,ttf,svg,woff,eot}'],
+                    dest: 'dist/'
                 }]
             }
         },
@@ -98,8 +99,41 @@ module.exports = grunt => {
                 stripBanners: true
             },
             css: {
-                src: ['/node_modules/bootstrap/dist/css/bootstrap.css'],
-                dest: 'dist/assets/styles/vendor.css'
+                src: ['/node_modules/jquery/dist/jquery.js',
+                '/node_modules/popper.js/dist/umd/popper.js',
+                '/node_modules/bootstrap/dist/js/bootstrap.js'],
+                dest: 'dist/vor.js'
+            }
+        },
+        uglify: {
+            options:{
+                sourceMap: false,
+                stripBanners: true,
+            }
+        },
+        cssmin: {
+
+        },
+        connect: {
+            server: {
+                options: {
+                    port: 2080,
+                    base: ['temp','.']
+                }
+            }
+        },
+        watch:{
+            css: {
+                options: {
+                    livereload: true
+                },
+                files: ['temp/**/*.css']
+            },
+            js: {
+                options: {
+                    livereload: true
+                },
+                files: ['temp/**/*.js']
             }
         }
     })
@@ -121,15 +155,34 @@ module.exports = grunt => {
         grunt.file.write('dist/index.html',result[0])
         let obj = Object.assign({},result[1].css,result[1].js)
         console.log(obj)
-        for (const key in obj) {
-            if (obj[key]) {
-                
+        
+        let js = {}
+        let css = {}
+        for (let key in obj) {
+            let data = obj[key]
+            key = key.startsWith('assets') ? `dist/${key}` : key
+            let arr = data.assets.map(i => {
+                let val = i.startsWith('assets') ? `temp/${i}` : i
+                val = val.startsWith('/node_modules') ? `.${val}` : val
+                return val
+            })
+            if (key.endsWith('.js')) {
+                js[key] = arr
+            }
+            if (key.endsWith('.css')) {
+                css[key] = arr
             }
         }
-        // result[1].forEach(element => {
-            
-        // });
+        console.log(js)
+        grunt.config.set('uglify.jsmin', {
+            files: js
+        })
+        grunt.config.set('cssmin.cssmin', {
+            files: css
+        })
     })
 
     grunt.registerTask('compile', ['sass','babel','pages'])
+    grunt.registerTask('build', ['htmllink','uglify:jsmin','cssmin:cssmin'])
+    grunt.registerTask('srver', ['connect','watch'])
 }
