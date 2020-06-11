@@ -25,11 +25,10 @@
   },
   "scripts": {
     "clean": "grunt clean",
-    "lint": "gulp lint",
-    "serve": "gulp openServe",
-    "build": "gulp build",
-    "start": "gulp start",
-    "deploy": "gulp deploy --production"
+    "serve": "grunt openServe",
+    "build": "grunt build",
+    "start": "grunt start",
+    "deploy": "grunt deploy --production"
   },
   "browserslist": [
     "last 1 version",
@@ -64,7 +63,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",
-    "grunt-contrib-imagemin": "^4.0.0",
+    "grunt-contrib-imagemin": "^4.0.0"
   },
   "engines": {
     "node": ">=6"

@@ -162,7 +162,7 @@ module.exports = grunt => {
             },
             dist: {
                 options: {
-                    base:[config.build.dist,'.']
+                    base:['dist','.']
                 }
             }
         },
@@ -294,6 +294,9 @@ module.exports = grunt => {
 
     // 上线前压缩： 执行顺序：编译文件 -> 编译html引用 -> 合成html引用的css、js文件并压缩 -> 压缩图片和字体文件 -> 复制静态文件 -> 压缩html文件
     grunt.registerTask('build', ['compile','htmllink','uglify:jsmin','cssmin:cssmin','imagemin','copy:public','htmlmin'])
+
+    // 压缩后开启服务器
+    grunt.registerTask('start', ['build','connect:dist', 'watch'])
     
     // 部署：操作完 build 后部署到 github 上
     grunt.registerTask('deploy', ['build','gh-pages'])
