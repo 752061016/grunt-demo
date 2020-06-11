@@ -161,9 +161,7 @@ module.exports = grunt => {
         },
         'gh-pages': {
             options: {
-                base: 'dist',
-                branch: 'pages',
-                // repo: 'https://github.com/752061016/752061016.github.io.git'
+                base: 'dist'
             },
             src: '**/*'
         }
