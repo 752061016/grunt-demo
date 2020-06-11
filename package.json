@@ -24,9 +24,9 @@
     "url": "https://zce.me"
   },
   "scripts": {
-    "clean": "gulp clean",
+    "clean": "grunt clean",
     "lint": "gulp lint",
-    "serve": "gulp serve",
+    "serve": "gulp openServe",
     "build": "gulp build",
     "start": "gulp start",
     "deploy": "gulp deploy --production"
@@ -47,14 +47,17 @@
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-connect": "^2.1.0",
     "grunt-contrib-cssmin": "^3.0.0",
+    "grunt-contrib-htmlmin": "^3.1.0",
     "grunt-contrib-uglify": "^4.0.1",
     "grunt-contrib-watch": "^1.1.0",
+    "grunt-gh-pages": "^4.0.0",
     "grunt-pipe": "^1.0.0",
     "grunt-sass": "^3.1.0",
     "jquery": "3.4.1",
     "load-grunt-tasks": "^5.1.0",
     "popper.js": "1.16.1",
     "sass": "^1.26.8",
+    "serve-static": "^1.14.1",
     "swig": "^1.4.2",
     "useref": "^1.4.3"
   },
