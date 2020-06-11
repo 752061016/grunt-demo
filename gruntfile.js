@@ -161,9 +161,11 @@ module.exports = grunt => {
         },
         'gh-pages': {
             options: {
-                base: 'dist'
-              },
-            src: '**'
+                base: 'dist',
+                branch: 'pages',
+                // repo: 'https://github.com/752061016/752061016.github.io.git'
+            },
+            src: '**/*'
         }
     })
 
@@ -255,4 +257,6 @@ module.exports = grunt => {
     grunt.registerTask('openServe', ['compile','connect','watch'])
 
     grunt.registerTask('build', ['compile','htmllink','uglify:jsmin','cssmin:cssmin','htmlmin'])
+    
+    grunt.registerTask('deploy', ['build','gh-pages'])
 }
