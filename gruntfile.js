@@ -2,7 +2,6 @@ const sass = require('sass')
 const loadGruntTasks = require('load-grunt-tasks')
 const swig = require('swig')
 const useref = require('useref')
-const serveStatic = require('serve-static');
 
 // 默认文件路径配置
 let config = {
@@ -11,18 +10,20 @@ let config = {
         dist: 'dist',
         temp: 'temp',
         public: 'public',
+        htmlmin: 'htmlmin', // 保存压缩的html文件
         paths: {
             styles: 'assets/styles/*.scss',
             scripts: 'assets/scripts/*.js',
             pages: '*.html',
-            images: 'assets/images/**',
-            fonts: 'assets/fonts/**'
+            images: 'assets/images/*',
+            fonts: 'assets/fonts/*'
         }
     }
 }
 
 module.exports = grunt => {
     grunt.initConfig({
+        // 使用 grunt-sass 编译 scss 文件保存在 temp 文件夹
         sass: {
             options: {
                 implementation: sass,
@@ -38,6 +39,8 @@ module.exports = grunt => {
                 }]
             }
         },
+        // 使用 grunt-babel 编译js文件，
+        // 使用 @babel/core 和 @babel/preset-env 插件转换js新特性
         babel: {
             options: {
                 presets: ['@babel/preset-env']
@@ -63,32 +66,48 @@ module.exports = grunt => {
             }
         },
         clean: {
-            src: ['dist','temp','htmllink']
+            src: [config.build.dist,config.build.temp,config.build.htmlmin,'.grunt']
         },
         imagemin: {
-            dist: {
+            image: {
                 options: {
                     optimizationLevel: 3
                 },
                 files: [{
                     expand: true,
-                    cwd: 'src/',
-                    src: ['**/*.{png,jpg,jpeg,ttf,svg,woff,eot}'],
-                    dest: 'dist/'
+                    cwd: config.build.src,
+                    src: [config.build.paths.images],
+                    dest: config.build.dist
+                }]
+            },
+            font: {
+                options: {
+                    optimizationLevel: 3
+                },
+                files: [{
+                    expand: true,
+                    cwd: config.build.src,
+                    src: [config.build.paths.fonts],
+                    dest: config.build.dist
                 }]
             }
         },
-        concat: {
-            options:{
-                //文件内容的分隔符
-                separator: ';',
-                stripBanners: true
-            },
-            css: {
-                src: ['/node_modules/jquery/dist/jquery.js',
-                '/node_modules/popper.js/dist/umd/popper.js',
-                '/node_modules/bootstrap/dist/js/bootstrap.js'],
-                dest: 'dist/vor.js'
+        // 使用 grunt-contrib-copy 插件复制 public 文件夹中的静态文件
+        copy: {
+            public: {
+                files:[{
+                    expand: true,
+                    src: ['**'],
+                    cwd: 'public',
+                    dest: 'dist'
+                }]
+            }
+        },
+        'font-spider': {
+            options: {},
+            main: {
+                src: 'temp/*.html',
+                dest: 'dist'
             }
         },
         uglify: {
@@ -117,9 +136,9 @@ module.exports = grunt => {
             dev: {                                       // Another target
                 files: [{
                   expand: true,
-                  cwd: 'htmlmin',
-                  src: ['*.html'],
-                  dest: 'dist'
+                  cwd: config.build.htmlmin,
+                  src: [config.build.paths.pages],
+                  dest: config.build.dist
               }]
             }
         },
@@ -128,13 +147,23 @@ module.exports = grunt => {
               port: 2080, //服务器的端口号，可用localhost:9000访问
               hostname: 'localhost', //服务器域名
               livereload: 35729, //声明给watch监听的端口
-              base:['temp','.']
+              
             },
             livereload: {
               options: {
                 open: false, // 关闭自动开启浏览器
 
               }
+            },
+            temp: {
+                options: {
+                    base:[config.build.temp,'.']
+                }
+            },
+            dist: {
+                options: {
+                    base:[config.build.dist,'.']
+                }
             }
         },
         watch:{
@@ -143,35 +172,42 @@ module.exports = grunt => {
                   livereload: '<%= connect.options.livereload %>'
                 },
                 files: [
-                  'temp/**'
+                  `${config.build.temp}/**`
                 ]
             },
             css: {
-                files: ['src/assets/styles/*.scss'],
+                options:{cwd: config.build.src},
+                files: [config.build.paths.styles],
                 tasks: ['sass']
             },
             js: {
-                files: ['src/assets/scripts/*.js'],
+                options:{cwd: config.build.src},
+                files: [config.build.paths.scripts],
                 tasks: ['babel']
             },
             html: {
-                files: ['src/*.html'],
+                options:{cwd: config.build.src},
+                files: [config.build.paths.pages],
                 tasks: ['pages']
             }
         },
         'gh-pages': {
             options: {
-                base: 'dist'
+                base: config.build.dist
             },
             src: '**/*'
         }
     })
-
-    grunt.registerMultiTask('pages', function () {
-        let tpl = swig.compileFile(this.data.input);
-        const {data} = require('./pages.config.js')
-        let renderedHtml = tpl(data);
-        grunt.file.write(this.data.output,renderedHtml)
+    grunt.registerTask('pages', function () {
+        // 遍历 src 文件夹下符合条件的 html 文件，输出文件路径
+        const pages = grunt.file.expand({cwd:'src'},'*.html')
+        // 根据文件路径读取文件并使用 swig 插件编译后存入 temp 文件夹
+        pages.forEach(page => {
+            let tpl = swig.compileFile(`${config.build.src}/${page}`);
+            const {data} = require('./pages.config.js')
+            let renderedHtml = tpl(data);
+            grunt.file.write(`${config.build.temp}/${page}`,renderedHtml)
+        });
     })
     
 
@@ -250,11 +286,15 @@ module.exports = grunt => {
     //     })
     // })
 
+    // 编译文件： 先删除临时文件， 再编译 scss、js、html 文件
     grunt.registerTask('compile', ['clean','sass','babel','pages'])
 
-    grunt.registerTask('openServe', ['compile','connect','watch'])
+    // 开发时开启服务器： 先编译文件，打开服务器再打开文件监听
+    grunt.registerTask('openServe', ['compile','connect:temp','watch'])
 
-    grunt.registerTask('build', ['compile','htmllink','uglify:jsmin','cssmin:cssmin','htmlmin'])
+    // 上线前压缩： 执行顺序：编译文件 -> 编译html引用 -> 合成html引用的css、js文件并压缩 -> 压缩图片和字体文件 -> 复制静态文件 -> 压缩html文件
+    grunt.registerTask('build', ['compile','htmllink','uglify:jsmin','cssmin:cssmin','imagemin','copy:public','htmlmin'])
     
+    // 部署：操作完 build 后部署到 github 上
     grunt.registerTask('deploy', ['build','gh-pages'])
 }

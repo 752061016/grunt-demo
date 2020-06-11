@@ -46,6 +46,7 @@
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-connect": "^2.1.0",
+    "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-cssmin": "^3.0.0",
     "grunt-contrib-htmlmin": "^3.1.0",
     "grunt-contrib-uglify": "^4.0.1",
@@ -62,7 +63,8 @@
     "useref": "^1.4.3"
   },
   "devDependencies": {
-    "grunt-contrib-imagemin": "^4.0.0"
+    "@babel/core": "^7.10.2",
+    "grunt-contrib-imagemin": "^4.0.0",
   },
   "engines": {
     "node": ">=6"

@@ -13,9 +13,9 @@ body {
 
 .jumbotron {
   margin-bottom: 0;
-  padding-top: $jumbotron-padding;
-  padding-bottom: $jumbotron-padding;
-  background-color: $jumbotron-bg;
+      padding-top: $jumbotron-padding;
+      padding-bottom: $jumbotron-padding;
+      background-color: $jumbotron-bg;
 
   @media (min-width: 768px) {
     padding-top: 6rem;
