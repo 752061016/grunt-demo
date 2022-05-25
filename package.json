@@ -40,7 +40,7 @@
     "@babel/core": "^7.10.2",
     "@babel/preset-env": "^7.10.2",
     "bootstrap": "4.4.1",
-    "grunt": "^1.1.0",
+    "grunt": "^1.5.3",
     "grunt-babel": "^8.0.0",
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-concat": "^1.0.1",
